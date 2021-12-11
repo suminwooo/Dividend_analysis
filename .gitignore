@@ -9,6 +9,8 @@
 pyproject.toml
 .flake8
 .vscode
+*.txt
+*.pickle
 
 ### Flask ###
 instance/*
