@@ -1,9 +1,9 @@
 import pandas as pd
 import FinanceDataReader as fdr
-from gspread_dataframe import set_with_dataframe
+from gspread_dataframe import set_with_dataframe, get_as_dataframe
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from new_file.config import doc
+from dividend.config import doc
 
 
 def _find_date():
@@ -127,7 +127,7 @@ def _find_close_vol_data(tmp_stock, result):
 
     result = [
         tmp_stock,
-        result[0][tmp_stock]["name"]["sector"],
+        result[0][tmp_stock]["sector_dic"]["name"],
         result[0][tmp_stock]["sector_dic"]["sector"],
         result[0][tmp_stock]["sector_dic"]["industry"],
     ] + tmp_value
@@ -143,29 +143,29 @@ def _find_all_stock_data(result):
     return total_lst
 
 
-def update_close_vol_sheet(div_split_statement_dic):
+def update_close_vol_sheet(div_split_statement_dic, IsUpdate):
 
     # 0. 필요한 시트 import
     close_vol_sheet = doc.worksheet("종가, 거래량 정보(결과)")
-
+    close_vol_sheet_data = get_as_dataframe(close_vol_sheet)
     # # 1. 데이터 만들기
     data = _find_all_stock_data(div_split_statement_dic)
-
     # 2. 시트 초기화후 업데이트
-    # 종가, 거래량 정보(결과) 초기화
-    set_with_dataframe(
-        close_vol_sheet,
-        pd.DataFrame([[None] * 34] * 200),
-        row=4,
-        include_index=False,
-        include_column_header=False,
-    )
+    if IsUpdate is False:
+        # 행 초기화
+        set_with_dataframe(
+            close_vol_sheet,
+            pd.DataFrame([[None] * 34] * 200),
+            row=4,
+            include_index=False,
+            include_column_header=False,
+        )
 
     # 종가, 거래량 정보(결과) 업데이트
     set_with_dataframe(
         close_vol_sheet,
         pd.DataFrame(data),
-        row=4,
+        row=4 + len(close_vol_sheet_data["Symbol"].dropna()),
         include_index=False,
         include_column_header=False,
     )

@@ -1,4 +1,3 @@
-from new_file.findStockList import find_stock_list
 import yfinance as yf
 import collections
 from datetime import datetime
@@ -41,9 +40,10 @@ def _change_money_size(money_lst):
 def find_sector_industry(info_data):
     sector = info_data["sector"]
     industry = info_data["industry"]
+    name = info_data["shortName"]
     if (sector == None) | (industry == None):
         return "sector, industry 존재 X"
-    return {"sector": sector, "industry": industry}
+    return {"sector": sector, "industry": industry, "name": name}
 
 
 def find_dividend_info(info_data, actions_data, price_data):
@@ -195,6 +195,13 @@ def find_dividend_info(info_data, actions_data, price_data):
     else:
         typePayout = "배당킹"
 
+    # 5년전 평균 배당 수익률 값 없을 경우 -> None
+    if info_data["fiveYearAvgDividendYield"] == None:
+        fiveYearAvgDividendYield = "-"
+    else:
+        fiveYearAvgDividendYield = str(info_data["fiveYearAvgDividendYield"]) + "%"
+
+    # 최종 결과 데이터
     result = {
         # 배당 지표 및 정보
         "lastDividendValue": str(info_data["lastDividendValue"]) + "$",
@@ -205,7 +212,7 @@ def find_dividend_info(info_data, actions_data, price_data):
         "payoutRatio": str(round(info_data["payoutRatio"] * 100, 4)) + "%",
         "trailingAnnualDividendYield": str(info_data["trailingAnnualDividendYield"] * 100) + "%",
         "trailingAnnualDividendRate": str(info_data["trailingAnnualDividendRate"]) + "%",
-        "fiveYearAvgDividendYield": str(info_data["fiveYearAvgDividendYield"]) + "%",
+        "fiveYearAvgDividendYield": fiveYearAvgDividendYield,
         # 배당 기간 관련 정보
         "dividendCycle": dividendCycle,
         "dividendMonth": dividendMonth,
@@ -321,32 +328,45 @@ def find_statement_info(info_data, earnings_data, cashflow_data):
             str(round(((cash_tmp_lst[i + 1] - cash_tmp_lst[i]) / abs(cash_tmp_lst[i])) * 100, 2)) + "%"
         )
 
-    # 아래 5개의 값은 데이터가 없을 경우를 위해 예외 처리(중요한 데이터X)
-    # forwardEps 예외 처리
-    try:
+    # 아래 5개의 값은 데이터가 없을 경우를 위해 처리(중요한 데이터X)
+    # forwardEps 처리
+    if info_data["forwardEps"] == None:
+        forwardEps = "-"
+    else:
         forwardEps = info_data["forwardEps"]
-    except:
-        forwardEps = "데이터X"
-    # trailingEps 예외 처리
-    try:
+
+    # trailingEps 처리
+    if info_data["trailingEps"] == None:
+        trailingEps = "-"
+    else:
         trailingEps = info_data["trailingEps"]
-    except:
-        trailingEps = "데이터X"
-    # trailingPE 예외 처리
+
+    # trailingPE 처리
     try:
-        trailingPE = info_data["trailingPE"]
+        if info_data["trailingPE"] == None:
+            trailingPE = "-"
+        else:
+            trailingPE = info_data["trailingPE"]
     except:
-        trailingPE = "데이터X"
-    # forwardPE 예외 처리
+        trailingPE = "-"
+
+    # forwardPE 처리
     try:
-        forwardPE = info_data["forwardPE"]
+        if info_data["forwardPE"] == None:
+            forwardPE = "-"
+        else:
+            forwardPE = info_data["forwardPE"]
     except:
-        forwardPE = "데이터X"
-    # returnOnEquity 예외 처리
+        forwardPE = "-"
+
+    # returnOnEquity 처리
     try:
-        returnOnEquity = info_data["returnOnEquity"]
+        if info_data["returnOnEquity"] == None:
+            returnOnEquity = "-"
+        else:
+            returnOnEquity = info_data["returnOnEquity"]
     except:
-        returnOnEquity = "데이터X"
+        returnOnEquity = "-"
 
     result = {
         "earning_4yr_lst": earning_4yr_lst,
@@ -386,8 +406,7 @@ def find_total_information(stock_name):
     return result
 
 
-def make_dividend_statement_data():
-    stock_lst = find_stock_list()
+def make_dividend_statement_data(stock_lst):
     total_dic = {}
     no_dividend_data_stock_lst = []  # "배당 데이터X"
     no_2021_dividend_data_stock_lst = []  # "2021년 배당 데이터X"

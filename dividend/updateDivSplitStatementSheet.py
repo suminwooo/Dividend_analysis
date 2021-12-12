@@ -1,12 +1,13 @@
-from gspread_dataframe import set_with_dataframe
+from gspread_dataframe import set_with_dataframe, get_as_dataframe
 import pandas as pd
-from new_file.config import doc
+from dividend.config import doc
 
 
-def _fill_div_statement_data(result):
+def _fill_div_statement_data(result, IsUpdate):
 
     # 0. 필요한 시트 import
     split_statemene_sheet = doc.worksheet("액면분할, 재무제표 정보(결과)")
+    split_statemene_sheet_data = get_as_dataframe(split_statemene_sheet)
 
     # 데이터 만들기
     final_data = []
@@ -14,8 +15,7 @@ def _fill_div_statement_data(result):
         try:
             tmp_stock_data = [
                 stock_name,
-                #             result[0][stock_name]['sector_dic']['name'],
-                None,
+                result[0][stock_name]["sector_dic"]["name"],
                 result[0][stock_name]["sector_dic"]["sector"],
                 result[0][stock_name]["sector_dic"]["industry"],
                 result[0][stock_name]["split_dic"]["last_split_date"],
@@ -38,8 +38,7 @@ def _fill_div_statement_data(result):
         except:
             tmp_stock_data = [
                 stock_name,
-                #             result[0][stock_name]['sector_dic']['name'],
-                None,
+                result[0][stock_name]["sector_dic"]["name"],
                 result[0][stock_name]["sector_dic"]["sector"],
                 result[0][stock_name]["sector_dic"]["industry"],
                 "액면 분할 하지 않음",
@@ -63,36 +62,37 @@ def _fill_div_statement_data(result):
         final_data.append(tmp_stock_data)
 
     # 데이터 시트 입력
-    # 초기화
-    set_with_dataframe(
-        split_statemene_sheet,
-        pd.DataFrame([[None] * 20] * 200),
-        row=4,
-        include_index=False,
-        include_column_header=False,
-    )
+    if IsUpdate is False:
+        # 초기화
+        set_with_dataframe(
+            split_statemene_sheet,
+            pd.DataFrame([[None] * 20] * 200),
+            row=4,
+            include_index=False,
+            include_column_header=False,
+        )
 
     # 입력
     set_with_dataframe(
         split_statemene_sheet,
         pd.DataFrame(final_data),
-        row=4,
+        row=4 + len(split_statemene_sheet_data.iloc[2:]["Symbol"].dropna()),
         include_index=False,
         include_column_header=False,
     )
 
 
-def _fill_dividend_page(result):
+def _fill_dividend_page(result, IsUpdate):
     # 0. 필요한 시트 import
     dividend_sheet = doc.worksheet("배당 관련 정보(결과)")
+    dividend_sheet_data = get_as_dataframe(dividend_sheet)
 
     # 데이터 생성
     final_data = []
     for stock_name in result[0].keys():
         tmp_stock_data = [
             stock_name,
-            #             result[0][stock_name]['sector_dic']['name'],
-            None,
+            result[0][stock_name]["sector_dic"]["name"],
             result[0][stock_name]["sector_dic"]["sector"],
             result[0][stock_name]["sector_dic"]["industry"],
             result[0][stock_name]["devidend_dic"]["lastDividendValue"],
@@ -118,34 +118,26 @@ def _fill_dividend_page(result):
         ]
         final_data.append(tmp_stock_data)
 
-    # 초기화
-    set_with_dataframe(
-        dividend_sheet,
-        pd.DataFrame([[None] * 24] * 200),
-        row=4,
-        include_index=False,
-        include_column_header=False,
-    )
-
+    if IsUpdate is False:
+        # 초기화
+        set_with_dataframe(
+            dividend_sheet,
+            pd.DataFrame([[None] * 24] * 200),
+            row=4,
+            include_index=False,
+            include_column_header=False,
+        )
+    print(pd.DataFrame(final_data))
     # 입력
     set_with_dataframe(
         dividend_sheet,
         pd.DataFrame(final_data),
-        row=4,
+        row=4 + len(dividend_sheet_data.iloc[2:]["Symbol"].dropna()),
         include_index=False,
         include_column_header=False,
     )
 
 
-def update_div_split_statement_sheet():
-    # 임시
-    # load data
-    import pickle
-
-    with open("result.pickle", "rb") as fr:
-        result = pickle.load(fr)
-
-    # 실제
-
-    _fill_div_statement_data(result)
-    _fill_dividend_page(result)
+def update_div_split_statement_sheet(result, IsUpdate):
+    _fill_div_statement_data(result, IsUpdate)
+    _fill_dividend_page(result, IsUpdate)

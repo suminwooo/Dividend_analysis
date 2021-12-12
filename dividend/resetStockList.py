@@ -1,7 +1,7 @@
 from gspread_dataframe import get_as_dataframe, set_with_dataframe
 import pandas as pd
 from datetime import datetime
-from new_file.config import doc
+from dividend.config import doc
 
 
 def reset_stock_list():
