@@ -127,7 +127,6 @@ def _fill_dividend_page(result, IsUpdate):
             include_index=False,
             include_column_header=False,
         )
-    print(pd.DataFrame(final_data))
     # 입력
     set_with_dataframe(
         dividend_sheet,

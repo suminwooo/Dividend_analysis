@@ -32,20 +32,21 @@ def main():
     # 2. 업데이트할 종목 리스트 찾기
     print("check_stock_lst")
     check_stock_lst = find_stock_list(start_col)
+    print(check_stock_lst)
     # 3. 1번에서 찾은 종목에 대한 배당, 재무정보 찾기
     print("make_dividend_statement_data")
     result = make_dividend_statement_data(check_stock_lst)
 
     # 임시 -------------------------------
-    # import pickle
+    import pickle
 
-    # # save data
-    # with open("user.pickle", "wb") as fw:
-    #     pickle.dump(result, fw)
+    # save data
+    with open("user.pickle", "wb") as fw:
+        pickle.dump(result, fw)
 
-    # # load data
-    # with open("user.pickle", "rb") as fr:
-    #     result = pickle.load(fr)
+    # load data
+    with open("user.pickle", "rb") as fr:
+        result = pickle.load(fr)
 
     # 임시 -------------------------------
 

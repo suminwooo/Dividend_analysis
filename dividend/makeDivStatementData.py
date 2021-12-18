@@ -407,13 +407,14 @@ def find_total_information(stock_name):
 
 
 def make_dividend_statement_data(stock_lst):
+    print("pass")
     total_dic = {}
     no_dividend_data_stock_lst = []  # "배당 데이터X"
     no_2021_dividend_data_stock_lst = []  # "2021년 배당 데이터X"
     not_constant_data_during_20181920_stock_lst = []  # "2018,19,20 배당 수 일정X"
     no_data_stock_lst = []  # "데이터 존재X"
     unknown_err_lst = []  # "알수 없는 에러"
-    for idx, each_stock in enumerate(stock_lst[:10]):
+    for idx, each_stock in enumerate(stock_lst):
         try:
             print(each_stock)
             print(round(idx / len(stock_lst) * 100, 2), "% 진행중")
