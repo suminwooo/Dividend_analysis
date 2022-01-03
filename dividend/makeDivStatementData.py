@@ -305,12 +305,18 @@ def find_statement_info(info_data, earnings_data, cashflow_data):
         # earning 변화율
         earning_tmp_lst = list(earnings_data["Earnings"])[::-1]
         earning_ratio_lst.append(
-            str(round(((earning_tmp_lst[i + 1] - earning_tmp_lst[i]) / abs(earning_tmp_lst[i])) * 100, 2)) + "%"
+            str(
+                (-1) * round(((earning_tmp_lst[i + 1] - earning_tmp_lst[i]) / abs(earning_tmp_lst[i])) * 100, 2)
+            )
+            + "%"
         )
         # revenue 변화율
         revenue_tmp_lst = list(earnings_data["Revenue"])[::-1]
         revenue_ratio_lst.append(
-            str(round(((revenue_tmp_lst[i + 1] - revenue_tmp_lst[i]) / abs(revenue_tmp_lst[i])) * 100, 2)) + "%"
+            str(
+                (-1) * round(((revenue_tmp_lst[i + 1] - revenue_tmp_lst[i]) / abs(revenue_tmp_lst[i])) * 100, 2)
+            )
+            + "%"
         )
         # 현금 흐름 변화율
         cash_tmp_lst = (
@@ -325,7 +331,7 @@ def find_statement_info(info_data, earnings_data, cashflow_data):
             .tolist()[1:][::-1]
         )
         cash_ratio_lst.append(
-            str(round(((cash_tmp_lst[i + 1] - cash_tmp_lst[i]) / abs(cash_tmp_lst[i])) * 100, 2)) + "%"
+            str((-1) * round(((cash_tmp_lst[i + 1] - cash_tmp_lst[i]) / abs(cash_tmp_lst[i])) * 100, 2)) + "%"
         )
 
     # 아래 5개의 값은 데이터가 없을 경우를 위해 처리(중요한 데이터X)
